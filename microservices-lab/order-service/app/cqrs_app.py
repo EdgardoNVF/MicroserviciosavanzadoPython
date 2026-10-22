@@ -1,8 +1,9 @@
+from shared.auth import configure_auth,require_ops_admin
 import asyncio
 import os
 import secrets
 from contextlib import asynccontextmanager
-from fastapi import FastAPI,Header
+from fastapi import FastAPI,Header,Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy import select,text
 from sqlalchemy.exc import SQLAlchemyError
@@ -18,7 +19,7 @@ from shared.kafka import EventPublisher
 from shared.health import HealthResponse,HEALTH_RESPONSES
 
 # Factory accepts a store/publisher for isolated integration tests.
-def create_cqrs_app(store=None,messaging=False,publisher=None,admin_key=None,resilience=False,inventory_client=None):
+def create_cqrs_app(store=None,messaging=False,publisher=None,admin_key=None,resilience=False,inventory_client=None,auth=False,jwt_validator=None):
     settings=Settings()
     store=store if store is not None else EventStore(settings.database_url,settings.snapshot_threshold)
     key=admin_key if admin_key is not None else settings.admin_key
@@ -38,8 +39,10 @@ def create_cqrs_app(store=None,messaging=False,publisher=None,admin_key=None,res
                 relay.stop_event.set();await task
             if active_publisher:await asyncio.to_thread(active_publisher.close)
             if resilience:await application.state.inventory_client.close()
+            if application.state.jwt_validator:await application.state.jwt_validator.close()
             await store.engine.dispose()
-    application=FastAPI(title='OrderService Event Sourcing / CQRS',version='4.0.0',lifespan=lifespan)
+    application=FastAPI(title='OrderService Event Sourcing / CQRS',version='5.0.0',lifespan=lifespan)
+    configure_auth(application,'order-api',auth,jwt_validator)
     application.state.store=store;application.state.commands=OrderCommands(store)
     application.state.queries=OrderQueries(store.sessions)
     application.state.relay_task=None;application.state.publisher=None
@@ -55,7 +58,7 @@ def create_cqrs_app(store=None,messaging=False,publisher=None,admin_key=None,res
     async def database_failure(request,exception):
         return JSONResponse(status_code=503,content={'code':'DATABASE_UNAVAILABLE','message':'Database operation failed'})
 
-    @application.post('/admin/rebuild-projections',tags=['Admin'],responses={403:{'description':'Clave administrativa inválida'}})
+    @application.post('/admin/rebuild-projections',dependencies=[Depends(require_ops_admin)],tags=['Admin'],responses={403:{'description':'Clave administrativa inválida'}})
     async def rebuild(admin:str|None=Header(None,alias='X-Admin-Key')):
         if not admin or not secrets.compare_digest(admin,key):
             return JSONResponse(status_code=403,content={'detail':'Invalid admin key'})

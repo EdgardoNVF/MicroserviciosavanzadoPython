@@ -1,4 +1,4 @@
-name: micr-lab04
+name: micr-lab05
 services:
   order-service:
     build:
