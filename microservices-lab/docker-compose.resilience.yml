@@ -1,0 +1,15 @@
+services:
+  order-service:
+    environment:
+      RESILIENCE_ENABLED: "true"
+      INVENTORY_BASE_URL: http://inventory-service:8002
+      RESILIENCE_REDIS_URL: redis://redis:6379/1
+      RESILIENCE_NAMESPACE: lab04:orders:normal:inventory
+      RESILIENCE_FAIL_MAX: "5"
+      RESILIENCE_RESET_TIMEOUT: "30"
+      RESILIENCE_MAX_CONCURRENT: "10"
+    depends_on:
+      inventory-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy

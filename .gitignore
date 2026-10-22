@@ -1,0 +1,33 @@
+# ============================================================
+# MICROSERVICES LAB - GITIGNORE
+# Python / FastAPI / Docker / Kubernetes / Helm
+# ============================================================
+
+# ------------------------------------------------------------
+# Python - bytecode y cachés
+# ------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Herramientas y pruebas
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+test-results/

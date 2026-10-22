@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16.3-alpine
+    environment:
+      POSTGRES_USER: lab_admin
+      POSTGRES_PASSWORD: lab_admin_lab_pass
+      POSTGRES_DB: eventstore_db
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab_admin -d eventstore_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  order-service:
+    environment:
+      EVENTSTORE_ENABLED: "true"
+      EVENTSTORE_DATABASE_URL: postgresql+asyncpg://order_app:order_app_lab_pass@postgres:5432/eventstore_db
+      EVENTSTORE_ADMIN_KEY: lab-admin-key
+      EVENTSTORE_SNAPSHOT_THRESHOLD: "10"
+    depends_on:
+      postgres:
+        condition: service_healthy
+volumes:
+  postgres-data:
