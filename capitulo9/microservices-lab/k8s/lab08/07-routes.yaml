@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: lab08-probes
+  namespace: microservices
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: Host(`microservices.local`) && Path(`/api/v1/lab08/orders/probe`)
+    services:
+    - name: order-service
+      port: 8001
+  - kind: Rule
+    match: Host(`microservices.local`) && Path(`/api/v1/lab08/inventory/probe`)
+    services:
+    - name: inventory-service
+      port: 8002

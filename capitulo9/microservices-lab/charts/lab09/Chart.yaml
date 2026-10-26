@@ -1,0 +1,6 @@
+apiVersion: v2
+name: lab09
+description: Migracion de Orders e Inventory del Lab 8 a Helm
+type: application
+version: 0.1.0
+appVersion: "9.0.0"

@@ -1,0 +1,38 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: orders
+  namespace: microservices
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      priority: 20
+      match: Host(`microservices.local`) && (Path(`/api/v1/orders`) || PathPrefix(`/api/v1/orders/`))
+      middlewares:
+        - name: orders-rate
+        - name: orders-circuit
+      services:
+        - name: order-service
+          port: 8001
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: inventory
+  namespace: microservices
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      priority: 20
+      match: Host(`microservices.local`) && (Path(`/api/v1/products`) || PathPrefix(`/api/v1/products/`) || Path(`/api/v1/reservations`) || PathPrefix(`/api/v1/reservations/`))
+      middlewares:
+        - name: inventory-rate
+        - name: inventory-circuit
+      services:
+        - name: inventory-service
+          port: 8002
+

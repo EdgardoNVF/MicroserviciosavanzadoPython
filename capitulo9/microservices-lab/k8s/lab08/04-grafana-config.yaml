@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: observability
+data:
+  datasources.yaml: "apiVersion: 1\ndatasources:\n- name: Prometheus\n  uid: prometheus\n\
+    \  type: prometheus\n  access: proxy\n  url: http://prometheus:9090\n  isDefault:\
+    \ true\n- name: Jaeger\n  uid: jaeger\n  type: jaeger\n  access: proxy\n  url:\
+    \ http://jaeger:16686\n"
+  dashboards.yaml: "apiVersion: 1\nproviders:\n- name: Lab08\n  type: file\n  options:\n\
+    \    path: /etc/grafana/lab-dashboards\n"

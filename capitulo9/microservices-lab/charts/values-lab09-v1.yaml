@@ -1,0 +1,13 @@
+{
+  "hardening": true,
+  "services": {
+    "order-service": {
+      "image": "localhost:5000/order-service@sha256:a5a95e3c071cfe3549403e970944ad98c8766973479f82b3568b477572b872c8",
+      "pullPolicy": "IfNotPresent"
+    },
+    "inventory-service": {
+      "image": "localhost:5000/inventory-service@sha256:0cb661047278b8a2dfaf141848a381a8dd7b0c31d739d3c39f7ee32762e3dbe0",
+      "pullPolicy": "IfNotPresent"
+    }
+  }
+}

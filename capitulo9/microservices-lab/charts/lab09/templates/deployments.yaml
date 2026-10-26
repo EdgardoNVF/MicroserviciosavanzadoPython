@@ -1,0 +1,33 @@
+{{- range $name, $config := .Values.services }}
+{{- $path := printf "files/%s.json" $name }}
+{{- $raw := required (printf "Falta %s; ejecutar capture.py" $path) ($.Files.Get $path) }}
+{{- $deployment := mustFromJson $raw }}
+{{- $meta := $deployment.metadata }}
+{{- $_ := set $meta "namespace" $.Release.Namespace }}
+{{- $labels := default (dict) $meta.labels }}
+{{- $_ := set $labels "app.kubernetes.io/managed-by" "Helm" }}
+{{- $_ := set $meta "labels" $labels }}
+{{- $annotations := default (dict) $meta.annotations }}
+{{- $_ := set $annotations "meta.helm.sh/release-name" $.Release.Name }}
+{{- $_ := set $annotations "meta.helm.sh/release-namespace" $.Release.Namespace }}
+{{- $_ := set $meta "annotations" $annotations }}
+{{- $pod := $deployment.spec.template.spec }}
+{{- $container := index $pod.containers 0 }}
+{{- $_ := set $container "image" (required "Se requiere image" $config.image) }}
+{{- $_ := set $container "imagePullPolicy" $config.pullPolicy }}
+{{- if $.Values.hardening }}
+{{- $security := default (dict) $container.securityContext }}
+{{- $_ := set $security "runAsNonRoot" true }}
+{{- $_ := set $security "runAsUser" 10001 }}
+{{- $_ := set $security "runAsGroup" 10001 }}
+{{- $_ := set $security "allowPrivilegeEscalation" false }}
+{{- $_ := set $security "privileged" false }}
+{{- $_ := set $security "capabilities" (dict "drop" (list "ALL")) }}
+{{- $_ := set $container "securityContext" $security }}
+{{- $podSecurity := default (dict) $pod.securityContext }}
+{{- $_ := set $podSecurity "fsGroup" 10001 }}
+{{- $_ := set $pod "securityContext" $podSecurity }}
+{{- end }}
+---
+{{ $deployment | toYaml }}
+{{ end }}

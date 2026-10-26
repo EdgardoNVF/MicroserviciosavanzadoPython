@@ -1,0 +1,228 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "order-service",
+    "namespace": "microservices",
+    "labels": {}
+  },
+  "spec": {
+    "progressDeadlineSeconds": 600,
+    "replicas": 1,
+    "revisionHistoryLimit": 10,
+    "selector": {
+      "matchLabels": {
+        "app": "order-service"
+      }
+    },
+    "strategy": {
+      "type": "Recreate"
+    },
+    "template": {
+      "metadata": {
+        "annotations": {
+          "kubectl.kubernetes.io/restartedAt": "2026-10-26T09:22:58+01:00"
+        },
+        "labels": {
+          "app": "order-service"
+        }
+      },
+      "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "OBSERVABILITY_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "LAB08_PROBES_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT",
+                "value": "http://otel-collector.observability.svc.cluster.local:4318/v1/traces"
+              },
+              {
+                "name": "OTEL_TRACES_SAMPLER",
+                "value": "always_on"
+              },
+              {
+                "name": "VAULT_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "VAULT_ADDR",
+                "value": "http://vault.vault.svc.cluster.local:8200"
+              },
+              {
+                "name": "VAULT_ROLE",
+                "value": "lab07-orders"
+              },
+              {
+                "name": "VAULT_KV_MOUNT",
+                "value": "lab07"
+              },
+              {
+                "name": "VAULT_SECRET_PATH",
+                "value": "orders"
+              },
+              {
+                "name": "VAULT_JWT_FILE",
+                "value": "/var/run/vault/token"
+              },
+              {
+                "name": "AUTH_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "AUTH_ISSUER",
+                "value": "http://localhost:8080/realms/microservices-lab"
+              },
+              {
+                "name": "AUTH_JWKS_URL",
+                "value": "http://keycloak:8080/realms/microservices-lab/protocol/openid-connect/certs"
+              },
+              {
+                "name": "EVENTSTORE_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "MESSAGING_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "KAFKA_BOOTSTRAP_SERVERS",
+                "value": "kafka:9092"
+              },
+              {
+                "name": "RESILIENCE_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "INVENTORY_BASE_URL",
+                "value": "http://inventory-service:8002"
+              },
+              {
+                "name": "RESILIENCE_REDIS_URL",
+                "value": "redis://redis:6379/1"
+              },
+              {
+                "name": "RESILIENCE_NAMESPACE",
+                "value": "lab06:orders:normal:inventory"
+              },
+              {
+                "name": "RESILIENCE_FAIL_MAX",
+                "value": "5"
+              },
+              {
+                "name": "RESILIENCE_RESET_TIMEOUT",
+                "value": "30"
+              },
+              {
+                "name": "RESILIENCE_MAX_CONCURRENT",
+                "value": "10"
+              },
+              {
+                "name": "AUTH_TOKEN_URL",
+                "value": "http://keycloak:8080/realms/microservices-lab/protocol/openid-connect/token"
+              },
+              {
+                "name": "EVENTSTORE_DATABASE_URL",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "key": "EVENTSTORE_DATABASE_URL",
+                    "name": "lab-credentials"
+                  }
+                }
+              },
+              {
+                "name": "EVENTSTORE_ADMIN_KEY",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "key": "EVENTSTORE_ADMIN_KEY",
+                    "name": "lab-credentials"
+                  }
+                }
+              },
+              {
+                "name": "ORDER_SERVICE_CLIENT_ID",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "key": "ORDER_SERVICE_CLIENT_ID",
+                    "name": "lab-credentials"
+                  }
+                }
+              },
+              {
+                "name": "ORDER_SERVICE_CLIENT_SECRET",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "key": "ORDER_SERVICE_CLIENT_SECRET",
+                    "name": "lab-credentials"
+                  }
+                }
+              }
+            ],
+            "image": "order-service:lab08",
+            "imagePullPolicy": "Never",
+            "name": "order-service",
+            "ports": [
+              {
+                "containerPort": 8001,
+                "protocol": "TCP"
+              }
+            ],
+            "readinessProbe": {
+              "failureThreshold": 60,
+              "httpGet": {
+                "path": "/health",
+                "port": 8001,
+                "scheme": "HTTP"
+              },
+              "periodSeconds": 5,
+              "successThreshold": 1,
+              "timeoutSeconds": 3
+            },
+            "resources": {},
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/var/run/vault",
+                "name": "vault-identity",
+                "readOnly": true
+              }
+            ]
+          }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": false,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "orders-vault",
+        "serviceAccountName": "orders-vault",
+        "terminationGracePeriodSeconds": 30,
+        "volumes": [
+          {
+            "name": "vault-identity",
+            "projected": {
+              "defaultMode": 420,
+              "sources": [
+                {
+                  "serviceAccountToken": {
+                    "audience": "vault",
+                    "expirationSeconds": 3600,
+                    "path": "token"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

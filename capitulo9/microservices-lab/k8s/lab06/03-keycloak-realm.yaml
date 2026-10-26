@@ -1,0 +1,193 @@
+apiVersion: v1
+data:
+  microservices-lab-realm.json: "{\r\n  \"realm\": \"microservices-lab\",\r\n  \"enabled\":
+    true,\r\n  \"sslRequired\": \"none\",\r\n  \"accessTokenLifespan\": 300,\r\n  \"registrationAllowed\":
+    false,\r\n  \"roles\": {\r\n    \"realm\": [\r\n      {\r\n        \"name\": \"order:read\"\r\n
+    \     },\r\n      {\r\n        \"name\": \"order:write\"\r\n      },\r\n      {\r\n
+    \       \"name\": \"inventory:read\"\r\n      },\r\n      {\r\n        \"name\":
+    \"inventory:write\"\r\n      },\r\n      {\r\n        \"name\": \"ops:admin\"\r\n
+    \     }\r\n    ]\r\n  },\r\n  \"clientScopes\": [\r\n    {\r\n      \"name\":
+    \"orders.read\",\r\n      \"protocol\": \"openid-connect\",\r\n      \"attributes\":
+    {\r\n        \"include.in.token.scope\": \"true\"\r\n      },\r\n      \"protocolMappers\":
+    [\r\n        {\r\n          \"name\": \"aud-order-api\",\r\n          \"protocol\":
+    \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-audience-mapper\",\r\n
+    \         \"config\": {\r\n            \"included.custom.audience\": \"order-api\",\r\n
+    \           \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"false\"\r\n          }\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\":
+    \"orders.write\",\r\n      \"protocol\": \"openid-connect\",\r\n      \"attributes\":
+    {\r\n        \"include.in.token.scope\": \"true\"\r\n      },\r\n      \"protocolMappers\":
+    [\r\n        {\r\n          \"name\": \"aud-order-api\",\r\n          \"protocol\":
+    \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-audience-mapper\",\r\n
+    \         \"config\": {\r\n            \"included.custom.audience\": \"order-api\",\r\n
+    \           \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"false\"\r\n          }\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\":
+    \"inventory.read\",\r\n      \"protocol\": \"openid-connect\",\r\n      \"attributes\":
+    {\r\n        \"include.in.token.scope\": \"true\"\r\n      },\r\n      \"protocolMappers\":
+    [\r\n        {\r\n          \"name\": \"aud-inventory-api\",\r\n          \"protocol\":
+    \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-audience-mapper\",\r\n
+    \         \"config\": {\r\n            \"included.custom.audience\": \"inventory-api\",\r\n
+    \           \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"false\"\r\n          }\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\":
+    \"inventory.write\",\r\n      \"protocol\": \"openid-connect\",\r\n      \"attributes\":
+    {\r\n        \"include.in.token.scope\": \"true\"\r\n      },\r\n      \"protocolMappers\":
+    [\r\n        {\r\n          \"name\": \"aud-inventory-api\",\r\n          \"protocol\":
+    \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-audience-mapper\",\r\n
+    \         \"config\": {\r\n            \"included.custom.audience\": \"inventory-api\",\r\n
+    \           \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"false\"\r\n          }\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\":
+    \"ops.admin\",\r\n      \"protocol\": \"openid-connect\",\r\n      \"attributes\":
+    {\r\n        \"include.in.token.scope\": \"true\"\r\n      },\r\n      \"protocolMappers\":
+    [\r\n        {\r\n          \"name\": \"aud-order-api\",\r\n          \"protocol\":
+    \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-audience-mapper\",\r\n
+    \         \"config\": {\r\n            \"included.custom.audience\": \"order-api\",\r\n
+    \           \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"false\"\r\n          }\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"clients\":
+    [\r\n    {\r\n      \"clientId\": \"lab-admin-client\",\r\n      \"enabled\":
+    true,\r\n      \"protocol\": \"openid-connect\",\r\n      \"publicClient\": false,\r\n
+    \     \"secret\": \"lab-admin-secret\",\r\n      \"clientAuthenticatorType\":
+    \"client-secret\",\r\n      \"serviceAccountsEnabled\": true,\r\n      \"standardFlowEnabled\":
+    false,\r\n      \"directAccessGrantsEnabled\": false,\r\n      \"fullScopeAllowed\":
+    false,\r\n      \"defaultClientScopes\": [],\r\n      \"optionalClientScopes\":
+    [\r\n        \"orders.read\",\r\n        \"orders.write\",\r\n        \"inventory.read\",\r\n
+    \       \"inventory.write\",\r\n        \"ops.admin\"\r\n      ],\r\n      \"protocolMappers\":
+    [\r\n        {\r\n          \"name\": \"realm-roles\",\r\n          \"protocol\":
+    \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-usermodel-realm-role-mapper\",\r\n
+    \         \"config\": {\r\n            \"claim.name\": \"realm_access.roles\",\r\n
+    \           \"jsonType.label\": \"String\",\r\n            \"multivalued\": \"true\",\r\n
+    \           \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"false\",\r\n            \"userinfo.token.claim\": \"false\"\r\n          }\r\n
+    \       },\r\n        {\r\n          \"name\": \"subject\",\r\n          \"protocol\":
+    \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-sub-mapper\",\r\n
+    \         \"config\": {\r\n            \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"true\",\r\n            \"introspection.token.claim\": \"true\"\r\n          }\r\n
+    \       }\r\n      ]\r\n    },\r\n    {\r\n      \"clientId\": \"readonly-client\",\r\n
+    \     \"enabled\": true,\r\n      \"protocol\": \"openid-connect\",\r\n      \"publicClient\":
+    false,\r\n      \"secret\": \"readonly-secret\",\r\n      \"clientAuthenticatorType\":
+    \"client-secret\",\r\n      \"serviceAccountsEnabled\": true,\r\n      \"standardFlowEnabled\":
+    false,\r\n      \"directAccessGrantsEnabled\": false,\r\n      \"fullScopeAllowed\":
+    false,\r\n      \"defaultClientScopes\": [],\r\n      \"optionalClientScopes\":
+    [\r\n        \"orders.read\",\r\n        \"inventory.read\"\r\n      ],\r\n      \"protocolMappers\":
+    [\r\n        {\r\n          \"name\": \"realm-roles\",\r\n          \"protocol\":
+    \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-usermodel-realm-role-mapper\",\r\n
+    \         \"config\": {\r\n            \"claim.name\": \"realm_access.roles\",\r\n
+    \           \"jsonType.label\": \"String\",\r\n            \"multivalued\": \"true\",\r\n
+    \           \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"false\",\r\n            \"userinfo.token.claim\": \"false\"\r\n          }\r\n
+    \       },\r\n        {\r\n          \"name\": \"subject\",\r\n          \"protocol\":
+    \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-sub-mapper\",\r\n
+    \         \"config\": {\r\n            \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"true\",\r\n            \"introspection.token.claim\": \"true\"\r\n          }\r\n
+    \       }\r\n      ]\r\n    },\r\n    {\r\n      \"clientId\": \"order-service-client\",\r\n
+    \     \"enabled\": true,\r\n      \"protocol\": \"openid-connect\",\r\n      \"publicClient\":
+    false,\r\n      \"secret\": \"order-svc-secret-lab\",\r\n      \"clientAuthenticatorType\":
+    \"client-secret\",\r\n      \"serviceAccountsEnabled\": true,\r\n      \"standardFlowEnabled\":
+    false,\r\n      \"directAccessGrantsEnabled\": false,\r\n      \"fullScopeAllowed\":
+    false,\r\n      \"defaultClientScopes\": [],\r\n      \"optionalClientScopes\":
+    [\r\n        \"inventory.read\"\r\n      ],\r\n      \"protocolMappers\": [\r\n
+    \       {\r\n          \"name\": \"realm-roles\",\r\n          \"protocol\": \"openid-connect\",\r\n
+    \         \"protocolMapper\": \"oidc-usermodel-realm-role-mapper\",\r\n          \"config\":
+    {\r\n            \"claim.name\": \"realm_access.roles\",\r\n            \"jsonType.label\":
+    \"String\",\r\n            \"multivalued\": \"true\",\r\n            \"access.token.claim\":
+    \"true\",\r\n            \"id.token.claim\": \"false\",\r\n            \"userinfo.token.claim\":
+    \"false\"\r\n          }\r\n        },\r\n        {\r\n          \"name\": \"subject\",\r\n
+    \         \"protocol\": \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-sub-mapper\",\r\n
+    \         \"config\": {\r\n            \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"true\",\r\n            \"introspection.token.claim\": \"true\"\r\n          }\r\n
+    \       }\r\n      ]\r\n    },\r\n    {\r\n      \"clientId\": \"inventory-service-client\",\r\n
+    \     \"enabled\": true,\r\n      \"protocol\": \"openid-connect\",\r\n      \"publicClient\":
+    false,\r\n      \"secret\": \"inventory-svc-secret-lab\",\r\n      \"clientAuthenticatorType\":
+    \"client-secret\",\r\n      \"serviceAccountsEnabled\": true,\r\n      \"standardFlowEnabled\":
+    false,\r\n      \"directAccessGrantsEnabled\": false,\r\n      \"fullScopeAllowed\":
+    false,\r\n      \"defaultClientScopes\": [],\r\n      \"optionalClientScopes\":
+    [\r\n        \"inventory.read\"\r\n      ],\r\n      \"protocolMappers\": [\r\n
+    \       {\r\n          \"name\": \"realm-roles\",\r\n          \"protocol\": \"openid-connect\",\r\n
+    \         \"protocolMapper\": \"oidc-usermodel-realm-role-mapper\",\r\n          \"config\":
+    {\r\n            \"claim.name\": \"realm_access.roles\",\r\n            \"jsonType.label\":
+    \"String\",\r\n            \"multivalued\": \"true\",\r\n            \"access.token.claim\":
+    \"true\",\r\n            \"id.token.claim\": \"false\",\r\n            \"userinfo.token.claim\":
+    \"false\"\r\n          }\r\n        },\r\n        {\r\n          \"name\": \"subject\",\r\n
+    \         \"protocol\": \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-sub-mapper\",\r\n
+    \         \"config\": {\r\n            \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"true\",\r\n            \"introspection.token.claim\": \"true\"\r\n          }\r\n
+    \       }\r\n      ]\r\n    },\r\n    {\r\n      \"clientId\": \"expiry-test-client\",\r\n
+    \     \"enabled\": true,\r\n      \"protocol\": \"openid-connect\",\r\n      \"publicClient\":
+    false,\r\n      \"secret\": \"expiry-test-secret\",\r\n      \"clientAuthenticatorType\":
+    \"client-secret\",\r\n      \"serviceAccountsEnabled\": true,\r\n      \"standardFlowEnabled\":
+    false,\r\n      \"directAccessGrantsEnabled\": false,\r\n      \"fullScopeAllowed\":
+    false,\r\n      \"defaultClientScopes\": [],\r\n      \"optionalClientScopes\":
+    [\r\n        \"orders.read\"\r\n      ],\r\n      \"protocolMappers\": [\r\n        {\r\n
+    \         \"name\": \"realm-roles\",\r\n          \"protocol\": \"openid-connect\",\r\n
+    \         \"protocolMapper\": \"oidc-usermodel-realm-role-mapper\",\r\n          \"config\":
+    {\r\n            \"claim.name\": \"realm_access.roles\",\r\n            \"jsonType.label\":
+    \"String\",\r\n            \"multivalued\": \"true\",\r\n            \"access.token.claim\":
+    \"true\",\r\n            \"id.token.claim\": \"false\",\r\n            \"userinfo.token.claim\":
+    \"false\"\r\n          }\r\n        },\r\n        {\r\n          \"name\": \"subject\",\r\n
+    \         \"protocol\": \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-sub-mapper\",\r\n
+    \         \"config\": {\r\n            \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"true\",\r\n            \"introspection.token.claim\": \"true\"\r\n          }\r\n
+    \       }\r\n      ],\r\n      \"attributes\": {\r\n        \"access.token.lifespan\":
+    \"2\"\r\n      }\r\n    },\r\n    {\r\n      \"clientId\": \"frontend-client\",\r\n
+    \     \"enabled\": true,\r\n      \"protocol\": \"openid-connect\",\r\n      \"publicClient\":
+    true,\r\n      \"serviceAccountsEnabled\": false,\r\n      \"standardFlowEnabled\":
+    true,\r\n      \"directAccessGrantsEnabled\": false,\r\n      \"fullScopeAllowed\":
+    false,\r\n      \"redirectUris\": [\r\n        \"http://127.0.0.1:8765/callback\"\r\n
+    \     ],\r\n      \"webOrigins\": [\r\n        \"http://127.0.0.1:8765\"\r\n      ],\r\n
+    \     \"defaultClientScopes\": [],\r\n      \"optionalClientScopes\": [\r\n        \"orders.read\",\r\n
+    \       \"orders.write\",\r\n        \"inventory.read\",\r\n        \"inventory.write\",\r\n
+    \       \"ops.admin\"\r\n      ],\r\n      \"protocolMappers\": [\r\n        {\r\n
+    \         \"name\": \"realm-roles\",\r\n          \"protocol\": \"openid-connect\",\r\n
+    \         \"protocolMapper\": \"oidc-usermodel-realm-role-mapper\",\r\n          \"config\":
+    {\r\n            \"claim.name\": \"realm_access.roles\",\r\n            \"jsonType.label\":
+    \"String\",\r\n            \"multivalued\": \"true\",\r\n            \"access.token.claim\":
+    \"true\",\r\n            \"id.token.claim\": \"false\",\r\n            \"userinfo.token.claim\":
+    \"false\"\r\n          }\r\n        },\r\n        {\r\n          \"name\": \"subject\",\r\n
+    \         \"protocol\": \"openid-connect\",\r\n          \"protocolMapper\": \"oidc-sub-mapper\",\r\n
+    \         \"config\": {\r\n            \"access.token.claim\": \"true\",\r\n            \"id.token.claim\":
+    \"true\",\r\n            \"introspection.token.claim\": \"true\"\r\n          }\r\n
+    \       }\r\n      ],\r\n      \"attributes\": {\r\n        \"pkce.code.challenge.method\":
+    \"S256\"\r\n      }\r\n    }\r\n  ],\r\n  \"users\": [\r\n    {\r\n      \"username\":
+    \"service-account-lab-admin-client\",\r\n      \"enabled\": true,\r\n      \"serviceAccountClientId\":
+    \"lab-admin-client\",\r\n      \"realmRoles\": [\r\n        \"order:read\",\r\n
+    \       \"order:write\",\r\n        \"inventory:read\",\r\n        \"inventory:write\",\r\n
+    \       \"ops:admin\"\r\n      ]\r\n    },\r\n    {\r\n      \"username\": \"service-account-readonly-client\",\r\n
+    \     \"enabled\": true,\r\n      \"serviceAccountClientId\": \"readonly-client\",\r\n
+    \     \"realmRoles\": [\r\n        \"order:read\",\r\n        \"inventory:read\"\r\n
+    \     ]\r\n    },\r\n    {\r\n      \"username\": \"service-account-order-service-client\",\r\n
+    \     \"enabled\": true,\r\n      \"serviceAccountClientId\": \"order-service-client\",\r\n
+    \     \"realmRoles\": [\r\n        \"inventory:read\"\r\n      ]\r\n    },\r\n
+    \   {\r\n      \"username\": \"service-account-inventory-service-client\",\r\n
+    \     \"enabled\": true,\r\n      \"serviceAccountClientId\": \"inventory-service-client\",\r\n
+    \     \"realmRoles\": [\r\n        \"inventory:read\"\r\n      ]\r\n    },\r\n
+    \   {\r\n      \"username\": \"service-account-expiry-test-client\",\r\n      \"enabled\":
+    true,\r\n      \"serviceAccountClientId\": \"expiry-test-client\",\r\n      \"realmRoles\":
+    [\r\n        \"order:read\"\r\n      ]\r\n    },\r\n    {\r\n      \"username\":
+    \"admin-user\",\r\n      \"enabled\": true,\r\n      \"firstName\": \"Lab\",\r\n
+    \     \"lastName\": \"admin-user\",\r\n      \"email\": \"admin-user@example.test\",\r\n
+    \     \"emailVerified\": true,\r\n      \"realmRoles\": [\r\n        \"order:read\",\r\n
+    \       \"order:write\",\r\n        \"inventory:read\",\r\n        \"inventory:write\",\r\n
+    \       \"ops:admin\"\r\n      ],\r\n      \"credentials\": [\r\n        {\r\n
+    \         \"type\": \"password\",\r\n          \"value\": \"Admin-Lab05!\",\r\n
+    \         \"temporary\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n
+    \     \"username\": \"readonly-user\",\r\n      \"enabled\": true,\r\n      \"firstName\":
+    \"Lab\",\r\n      \"lastName\": \"readonly-user\",\r\n      \"email\": \"readonly-user@example.test\",\r\n
+    \     \"emailVerified\": true,\r\n      \"realmRoles\": [\r\n        \"order:read\",\r\n
+    \       \"inventory:read\"\r\n      ],\r\n      \"credentials\": [\r\n        {\r\n
+    \         \"type\": \"password\",\r\n          \"value\": \"Read-Lab05!\",\r\n
+    \         \"temporary\": false\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"scopeMappings\":
+    [\r\n    {\r\n      \"client\": \"lab-admin-client\",\r\n      \"roles\": [\r\n
+    \       \"order:read\",\r\n        \"order:write\",\r\n        \"inventory:read\",\r\n
+    \       \"inventory:write\",\r\n        \"ops:admin\"\r\n      ]\r\n    },\r\n
+    \   {\r\n      \"client\": \"readonly-client\",\r\n      \"roles\": [\r\n        \"order:read\",\r\n
+    \       \"inventory:read\"\r\n      ]\r\n    },\r\n    {\r\n      \"client\":
+    \"order-service-client\",\r\n      \"roles\": [\r\n        \"inventory:read\"\r\n
+    \     ]\r\n    },\r\n    {\r\n      \"client\": \"inventory-service-client\",\r\n
+    \     \"roles\": [\r\n        \"inventory:read\"\r\n      ]\r\n    },\r\n    {\r\n
+    \     \"client\": \"expiry-test-client\",\r\n      \"roles\": [\r\n        \"order:read\"\r\n
+    \     ]\r\n    },\r\n    {\r\n      \"client\": \"frontend-client\",\r\n      \"roles\":
+    [\r\n        \"order:read\",\r\n        \"order:write\",\r\n        \"inventory:read\",\r\n
+    \       \"inventory:write\",\r\n        \"ops:admin\"\r\n      ]\r\n    }\r\n
+    \ ]\r\n}"
+kind: ConfigMap
+metadata:
+  name: keycloak-realm
+  namespace: microservices

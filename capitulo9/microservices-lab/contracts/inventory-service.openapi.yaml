@@ -1,0 +1,240 @@
+openapi: 3.1.0
+info:
+  title: inventory-service
+  version: 1.0.0
+  description: Contrato esperado independiente para Lab 01. No sobrescribir desde
+    /openapi.json.
+servers:
+- url: http://localhost:8002
+paths:
+  /api/v1/products:
+    post:
+      operationId: createProduct
+      responses:
+        '201':
+          description: Resultado esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '422':
+          description: Entrada inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreate'
+    get:
+      operationId: listProducts
+      responses:
+        '200':
+          description: Resultado esperado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+  /api/v1/products/{product_id}:
+    get:
+      operationId: getProduct
+      responses:
+        '200':
+          description: Resultado esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Recurso inexistente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessError'
+        '422':
+          description: Entrada inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema: &id005
+          type: string
+          format: uuid
+  /api/v1/reservations:
+    post:
+      operationId: createReservation
+      responses:
+        '201':
+          description: Resultado esperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockReservationResponse'
+        '404':
+          description: Recurso inexistente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessError'
+        '409':
+          description: Conflicto de negocio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessError'
+        '422':
+          description: Entrada inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockReservationCreate'
+  /health:
+    get:
+      operationId: health
+      responses:
+        '200':
+          description: Resultado esperado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: healthy
+                  service:
+                    type: string
+                    const: inventory-service
+                required:
+                - status
+                - service
+                additionalProperties: false
+components:
+  schemas:
+    ProductCreate:
+      type: object
+      properties:
+        name: &id001
+          type: string
+          minLength: 1
+          maxLength: 200
+        sku: &id002
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[A-Z0-9-]+$
+        stock_quantity: &id003
+          type: integer
+          minimum: 0
+          maximum: 1000000
+          default: 0
+        reorder_threshold: &id004
+          type: integer
+          minimum: 0
+          maximum: 1000000
+          default: 10
+      required:
+      - name
+      - sku
+      additionalProperties: false
+    Product:
+      type: object
+      properties:
+        name: *id001
+        sku: *id002
+        stock_quantity: *id003
+        reorder_threshold: *id004
+        id: *id005
+      required:
+      - name
+      - sku
+      - stock_quantity
+      - reorder_threshold
+      - id
+      additionalProperties: false
+    StockReservationCreate:
+      type: object
+      properties:
+        product_id: *id005
+        order_id: *id005
+        quantity: &id006
+          type: integer
+          minimum: 1
+          maximum: 1000000
+      required:
+      - product_id
+      - order_id
+      - quantity
+      additionalProperties: false
+    StockReservationResponse:
+      type: object
+      properties:
+        product_id: *id005
+        order_id: *id005
+        quantity: *id006
+        id: *id005
+        status:
+          type: string
+          enum:
+          - pending
+          - confirmed
+          - released
+      required:
+      - product_id
+      - order_id
+      - quantity
+      - id
+      - status
+      additionalProperties: false
+    BusinessError:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      additionalProperties: false
+    ValidationError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: array
+          items:
+            type: object
+            required:
+            - loc
+            - msg
+            - type
+            properties:
+              loc:
+                type: array
+                items:
+                  anyOf:
+                  - type: string
+                  - type: integer
+              msg:
+                type: string
+              type:
+                type: string
+            additionalProperties: true
+      additionalProperties: false

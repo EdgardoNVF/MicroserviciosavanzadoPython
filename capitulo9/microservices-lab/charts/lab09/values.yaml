@@ -1,0 +1,13 @@
+{
+  "hardening": false,
+  "services": {
+    "order-service": {
+      "image": "order-service:lab08",
+      "pullPolicy": "Never"
+    },
+    "inventory-service": {
+      "image": "inventory-service:lab08",
+      "pullPolicy": "Never"
+    }
+  }
+}

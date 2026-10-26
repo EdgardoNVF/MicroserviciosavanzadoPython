@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: inventory-lab
+  namespace: microservices
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      priority: 100
+      match: Host(`microservices.local`) && Path(`/api/v1/lab/inventory/failure`)
+      middlewares:
+        - name: inventory-lab-circuit
+      services:
+        - name: inventory-service
+          port: 8002

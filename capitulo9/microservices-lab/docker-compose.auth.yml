@@ -1,0 +1,69 @@
+services:
+  keycloak-db:
+    image: postgres:16.3-alpine
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak_lab_pass
+      POSTGRES_DB: keycloak
+    volumes:
+    - keycloak-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U keycloak -d keycloak
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.0
+    command:
+    - start-dev
+    - --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin_lab_pass
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak_lab_pass
+      KC_HOSTNAME: http://localhost:8080
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: 'true'
+      KC_HEALTH_ENABLED: 'true'
+    ports:
+    - 127.0.0.1:8080:8080
+    - 127.0.0.1:9000:9000
+    volumes:
+    - ./infra/keycloak:/opt/keycloak/data/import:ro
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - 'bash -c ''exec 3<>/dev/tcp/127.0.0.1/9000; printf "GET /health/ready HTTP/1.0\r\nHost:
+        localhost\r\n\r\n" >&3; read -r line <&3; [[ $$line == *200* ]]'''
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 30s
+  order-service:
+    environment:
+      AUTH_ENABLED: 'true'
+      AUTH_ISSUER: http://localhost:8080/realms/microservices-lab
+      AUTH_JWKS_URL: http://keycloak:8080/realms/microservices-lab/protocol/openid-connect/certs
+      AUTH_TOKEN_URL: http://keycloak:8080/realms/microservices-lab/protocol/openid-connect/token
+      ORDER_SERVICE_CLIENT_ID: order-service-client
+      ORDER_SERVICE_CLIENT_SECRET: order-svc-secret-lab
+    depends_on:
+      keycloak:
+        condition: service_healthy
+  inventory-service:
+    environment:
+      AUTH_ENABLED: 'true'
+      AUTH_ISSUER: http://localhost:8080/realms/microservices-lab
+      AUTH_JWKS_URL: http://keycloak:8080/realms/microservices-lab/protocol/openid-connect/certs
+    depends_on:
+      keycloak:
+        condition: service_healthy
+volumes:
+  keycloak-db-data: null

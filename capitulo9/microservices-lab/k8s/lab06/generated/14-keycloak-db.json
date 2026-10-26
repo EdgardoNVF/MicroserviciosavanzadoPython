@@ -1,0 +1,138 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "keycloak-db-data",
+        "namespace": "microservices"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "2Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "keycloak-db",
+        "namespace": "microservices"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "keycloak-db"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "keycloak-db"
+            }
+          },
+          "spec": {
+            "enableServiceLinks": false,
+            "containers": [
+              {
+                "name": "keycloak-db",
+                "image": "postgres:16.3-alpine",
+                "imagePullPolicy": "IfNotPresent",
+                "ports": [
+                  {
+                    "containerPort": 5432
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "POSTGRES_USER",
+                    "value": "keycloak"
+                  },
+                  {
+                    "name": "POSTGRES_DB",
+                    "value": "keycloak"
+                  },
+                  {
+                    "name": "PGDATA",
+                    "value": "/var/lib/postgresql/data/pgdata"
+                  },
+                  {
+                    "name": "POSTGRES_PASSWORD",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "lab-credentials",
+                        "key": "KEYCLOAK_DB_PASSWORD"
+                      }
+                    }
+                  }
+                ],
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "pg_isready",
+                      "-U",
+                      "keycloak",
+                      "-d",
+                      "keycloak"
+                    ]
+                  },
+                  "periodSeconds": 5,
+                  "timeoutSeconds": 5,
+                  "failureThreshold": 60
+                },
+                "volumeMounts": [
+                  {
+                    "name": "volume-0",
+                    "mountPath": "/var/lib/postgresql/data",
+                    "readOnly": false
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "volume-0",
+                "persistentVolumeClaim": {
+                  "claimName": "keycloak-db-data"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "keycloak-db",
+        "namespace": "microservices"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "selector": {
+          "app": "keycloak-db"
+        },
+        "ports": [
+          {
+            "name": "tcp-5432",
+            "port": 5432,
+            "targetPort": 5432
+          }
+        ]
+      }
+    }
+  ]
+}

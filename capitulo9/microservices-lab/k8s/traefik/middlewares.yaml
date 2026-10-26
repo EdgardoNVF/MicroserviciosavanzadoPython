@@ -1,0 +1,62 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: orders-rate
+  namespace: microservices
+spec:
+  rateLimit:
+    average: 100
+    period: 1m
+    burst: 20
+    sourceCriterion:
+      requestHost: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: inventory-rate
+  namespace: microservices
+spec:
+  rateLimit:
+    average: 200
+    period: 1m
+    burst: 40
+    sourceCriterion:
+      requestHost: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: orders-circuit
+  namespace: microservices
+spec:
+  circuitBreaker:
+    expression: "ResponseCodeRatio(500, 600, 0, 600) > 0.50"
+    checkPeriod: 100ms
+    fallbackDuration: 15s
+    recoveryDuration: 30s
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: inventory-circuit
+  namespace: microservices
+spec:
+  circuitBreaker:
+    expression: "ResponseCodeRatio(500, 600, 0, 600) > 0.50"
+    checkPeriod: 100ms
+    fallbackDuration: 15s
+    recoveryDuration: 30s
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: inventory-lab-circuit
+  namespace: microservices
+spec:
+  circuitBreaker:
+    expression: "ResponseCodeRatio(500, 600, 0, 600) > 0.50"
+    checkPeriod: 100ms
+    fallbackDuration: 3s
+    recoveryDuration: 2s
+

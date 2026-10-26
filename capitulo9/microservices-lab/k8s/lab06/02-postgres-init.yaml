@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  001_roles.sql: "CREATE ROLE order_app LOGIN PASSWORD 'order_app_lab_pass';\r\nGRANT
+    CONNECT ON DATABASE eventstore_db TO order_app;\r\nGRANT USAGE ON SCHEMA public
+    TO order_app;"
+kind: ConfigMap
+metadata:
+  name: postgres-init
+  namespace: microservices

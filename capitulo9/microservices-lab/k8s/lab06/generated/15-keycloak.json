@@ -1,0 +1,152 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "keycloak",
+        "namespace": "microservices"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "keycloak"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "keycloak"
+            }
+          },
+          "spec": {
+            "enableServiceLinks": false,
+            "containers": [
+              {
+                "name": "keycloak",
+                "image": "quay.io/keycloak/keycloak:26.8.0",
+                "imagePullPolicy": "IfNotPresent",
+                "ports": [
+                  {
+                    "containerPort": 8080
+                  },
+                  {
+                    "containerPort": 9000
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "KC_DB",
+                    "value": "postgres"
+                  },
+                  {
+                    "name": "KC_DB_URL",
+                    "value": "jdbc:postgresql://keycloak-db:5432/keycloak"
+                  },
+                  {
+                    "name": "KC_DB_USERNAME",
+                    "value": "keycloak"
+                  },
+                  {
+                    "name": "KC_BOOTSTRAP_ADMIN_USERNAME",
+                    "value": "admin"
+                  },
+                  {
+                    "name": "KC_HOSTNAME",
+                    "value": "http://localhost:8080"
+                  },
+                  {
+                    "name": "KC_HOSTNAME_BACKCHANNEL_DYNAMIC",
+                    "value": "true"
+                  },
+                  {
+                    "name": "KC_HEALTH_ENABLED",
+                    "value": "true"
+                  },
+                  {
+                    "name": "KC_DB_PASSWORD",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "lab-credentials",
+                        "key": "KEYCLOAK_DB_PASSWORD"
+                      }
+                    }
+                  },
+                  {
+                    "name": "KC_BOOTSTRAP_ADMIN_PASSWORD",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "lab-credentials",
+                        "key": "KEYCLOAK_ADMIN_PASSWORD"
+                      }
+                    }
+                  }
+                ],
+                "args": [
+                  "start-dev",
+                  "--import-realm"
+                ],
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/health/ready",
+                    "port": 9000
+                  },
+                  "periodSeconds": 5,
+                  "timeoutSeconds": 3,
+                  "failureThreshold": 60
+                },
+                "volumeMounts": [
+                  {
+                    "name": "volume-0",
+                    "mountPath": "/opt/keycloak/data/import",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "volume-0",
+                "configMap": {
+                  "name": "keycloak-realm"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "keycloak",
+        "namespace": "microservices"
+      },
+      "spec": {
+        "type": "ClusterIP",
+        "selector": {
+          "app": "keycloak"
+        },
+        "ports": [
+          {
+            "name": "tcp-8080",
+            "port": 8080,
+            "targetPort": 8080
+          },
+          {
+            "name": "tcp-9000",
+            "port": 9000,
+            "targetPort": 9000
+          }
+        ]
+      }
+    }
+  ]
+}

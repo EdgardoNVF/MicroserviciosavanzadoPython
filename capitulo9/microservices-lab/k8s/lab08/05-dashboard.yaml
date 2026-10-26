@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lab08-dashboard
+  namespace: observability
+data:
+  lab08.json: "{\n  \"uid\": \"lab08\",\n  \"title\": \"Lab08 - Orders e Inventory\"\
+    ,\n  \"schemaVersion\": 39,\n  \"version\": 1,\n  \"refresh\": \"5s\",\n  \"time\"\
+    : {\n    \"from\": \"now-15m\",\n    \"to\": \"now\"\n  },\n  \"templating\":\
+    \ {\n    \"list\": [\n      {\n        \"name\": \"traffic\",\n        \"type\"\
+    : \"custom\",\n        \"query\": \"business,lab\",\n        \"current\": {\n\
+    \          \"text\": \"lab\",\n          \"value\": \"lab\"\n        },\n    \
+    \    \"options\": [\n          {\n            \"text\": \"business\",\n      \
+    \      \"value\": \"business\",\n            \"selected\": false\n          },\n\
+    \          {\n            \"text\": \"lab\",\n            \"value\": \"lab\",\n\
+    \            \"selected\": true\n          }\n        ]\n      }\n    ]\n  },\n\
+    \  \"panels\": [\n    {\n      \"id\": 1,\n      \"type\": \"timeseries\",\n \
+    \     \"title\": \"Solicitudes por segundo\",\n      \"datasource\": {\n     \
+    \   \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n   \
+    \   \"gridPos\": {\n        \"x\": 0,\n        \"y\": 0,\n        \"w\": 12,\n\
+    \        \"h\": 8\n      },\n      \"targets\": [\n        {\n          \"refId\"\
+    : \"A\",\n          \"expr\": \"sum by (service) (rate(lab_http_requests_total{traffic=\\\
+    \"$traffic\\\"}[1m]))\",\n          \"legendFormat\": \"{{service}}\"\n      \
+    \  }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"\
+    unit\": \"reqps\"\n        },\n        \"overrides\": []\n      },\n      \"options\"\
+    : {\n        \"legend\": {\n          \"displayMode\": \"list\",\n          \"\
+    placement\": \"bottom\"\n        }\n      }\n    },\n    {\n      \"id\": 2,\n\
+    \      \"type\": \"timeseries\",\n      \"title\": \"Errores HTTP 5xx (%)\",\n\
+    \      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\":\
+    \ \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\": 12,\n       \
+    \ \"y\": 0,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"targets\"\
+    : [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"100 * sum by\
+    \ (service) (rate(lab_http_requests_total{traffic=\\\"$traffic\\\",status=~\\\"\
+    5..\\\"}[1m])) / sum by (service) (rate(lab_http_requests_total{traffic=\\\"$traffic\\\
+    \"}[1m]))\",\n          \"legendFormat\": \"{{service}}\"\n        }\n      ],\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"percent\"\
+    \n        },\n        \"overrides\": []\n      },\n      \"options\": {\n    \
+    \    \"legend\": {\n          \"displayMode\": \"list\",\n          \"placement\"\
+    : \"bottom\"\n        }\n      }\n    },\n    {\n      \"id\": 3,\n      \"type\"\
+    : \"timeseries\",\n      \"title\": \"Latencia p95 (segundos)\",\n      \"datasource\"\
+    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n    \
+    \  },\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 8,\n        \"\
+    w\": 12,\n        \"h\": 8\n      },\n      \"targets\": [\n        {\n      \
+    \    \"refId\": \"A\",\n          \"expr\": \"histogram_quantile(0.95, sum by\
+    \ (service, le) (rate(lab_http_duration_seconds_bucket{traffic=\\\"$traffic\\\"\
+    }[1m])))\",\n          \"legendFormat\": \"{{service}}\"\n        }\n      ],\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"s\"\n\
+    \        },\n        \"overrides\": []\n      },\n      \"options\": {\n     \
+    \   \"legend\": {\n          \"displayMode\": \"list\",\n          \"placement\"\
+    : \"bottom\"\n        }\n      }\n    },\n    {\n      \"id\": 4,\n      \"type\"\
+    : \"timeseries\",\n      \"title\": \"Solicitudes en curso (todas)\",\n      \"\
+    datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\
+    \n      },\n      \"gridPos\": {\n        \"x\": 12,\n        \"y\": 8,\n    \
+    \    \"w\": 12,\n        \"h\": 8\n      },\n      \"targets\": [\n        {\n\
+    \          \"refId\": \"A\",\n          \"expr\": \"lab_http_in_progress\",\n\
+    \          \"legendFormat\": \"{{service}}\"\n        }\n      ],\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"unit\": \"short\"\n        },\n    \
+    \    \"overrides\": []\n      },\n      \"options\": {\n        \"legend\": {\n\
+    \          \"displayMode\": \"list\",\n          \"placement\": \"bottom\"\n \
+    \       }\n      }\n    }\n  ]\n}"

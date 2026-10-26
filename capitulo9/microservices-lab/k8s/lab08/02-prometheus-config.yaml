@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: observability
+data:
+  prometheus.yaml: "global:\n  scrape_interval: 5s\n  evaluation_interval: 5s\nrule_files:\n\
+    - /etc/prometheus/alerts.yaml\nalerting:\n  alertmanagers:\n  - static_configs:\n\
+    \    - targets:\n      - alertmanager:9093\nscrape_configs:\n- job_name: microservices\n\
+    \  static_configs:\n  - targets:\n    - order-service.microservices.svc.cluster.local:8001\n\
+    \    - inventory-service.microservices.svc.cluster.local:8002\n"
+  alerts.yaml: "groups:\n- name: lab08-demo\n  rules:\n  - alert: Lab08ErroresAltos\n\
+    \    expr: (sum by (service) (rate(lab_http_requests_total{traffic=\"lab\",status=~\"\
+    5..\"}[1m]))\n      / sum by (service) (rate(lab_http_requests_total{traffic=\"\
+    lab\"}[1m])) > 0.10)\n      and on(service) (sum by (service) (increase(lab_http_requests_total{traffic=\"\
+    lab\"}[1m]))\n      >= 5)\n    for: 20s\n    labels:\n      severity: warning\n\
+    \      scope: lab\n    annotations:\n      summary: Errores de demostracion mayores\
+    \ a 10% en {{ $labels.service }}\n  - alert: Lab08LatenciaAlta\n    expr: (histogram_quantile(0.95,\
+    \ sum by (service, le) (rate(lab_http_duration_seconds_bucket{traffic=\"lab\"\
+    }[1m])))\n      > 0.5) and on(service) (sum by (service) (increase(lab_http_duration_seconds_count{traffic=\"\
+    lab\"}[1m]))\n      >= 5)\n    for: 20s\n    labels:\n      severity: warning\n\
+    \      scope: lab\n    annotations:\n      summary: Latencia p95 de demostracion\
+    \ mayor a 500 ms en {{ $labels.service }}\n"
